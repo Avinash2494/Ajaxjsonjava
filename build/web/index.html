@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CourseSearchPortal</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="http://cdn.datatables.net/1.10.0/css/jquery.dataTables.css" />
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+   <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="jquery.dataTables.js" type="text/javascript"></script>
+  <script>
+   function showHint(str) {
+  var xhttp;
+  if (str.length == 0) { 
+    document.getElementById("txtHint").innerHTML = "";
+    return;
+  }
+  xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+      document.getElementById("txtHint").innerHTML = xhttp.responseText;
+    }
+  };
+  xhttp.open("GET", "/coursessearchportal/hint?course="+str, true);
+  xhttp.send();   
+}
+</script>
+
+
+  <style type="text/css">
+        .container {
+            width: 980px;
+            margin:0 auto;
+        }
+       
+        .btn {
+            margin-bottom:30px
+        }
+  </style>
+  <script type="text/javascript">
+        $(document).ready(function() {
+            //$('#jsontable').dataTable( {
+            //     "ajax": 'arrays.txt'
+            // } );
+            var oTable = $('#jsontable').dataTable();  //Initialize the datatable
+            var host = window.document.location.hostname;
+            var port = location.port;
+            // var course = $("#course").val();
+            $('#load').on('click',function(){
+                var course = $("#course").val();
+                $.ajax({
+                        url: "http://"+host+":"+port+"/coursessearchportal/fetchcourse?course="+course,
+                        dataType: 'json',
+                        success: function(s){
+                            console.log(s);
+                            oTable.fnClearTable();
+                            for(var i = 0; i < s.length; i++) {
+                                oTable.fnAddData([
+                                    s[i].title,
+                                    s[i].price,
+                                    s[i].type,
+                                    s[i].category,
+                                    s[i].description,
+                                    s[i].rating,
+                                    s[i].image,
+                                    s[i].url
+                                ]);
+                            } // End For
+                        },
+                        error: function(e){
+                            console.log(e.responseText);
+                        }
+                    });
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+  <h2>Enter the name of Course</h2>
+  <form role="form">
+    <div class="form-group">
+      <label for="usr">Name:</label>
+      <input type="text" class="form-control" id="course" onkeyup="showHint(this.value)"> 
+    </div>
+   
+    </form>
+	<p>Suggestions: <span id="txtHint"></span></p> 
+         <center><input type="button" class="btn btn-primary" value="Add Course" id="load"/></center>
+
+   
+    <table id="jsontable" class="display table table-bordered" cellspacing="0" width="100%">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Rating</th>
+            <th>Image</th>
+            <th>Url</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+</body>
+</html>
